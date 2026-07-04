@@ -95,6 +95,33 @@ const sendEmailOtp = async (toEmail, code) => {
     },
   };
 
+  const sendOrderConfirmationEmail = async (toEmail, order) => {
+  if (!toEmail || !sesSourceEmail) return;
+
+  const itemsList = order.items
+    .map((item) => `- ${item.name} x${item.quantity} — $${item.price}`)
+    .join("\n");
+
+  const params = {
+    Source: `"Singh Coffee House" <${sesSourceEmail}>`,
+    Destination: { ToAddresses: [toEmail] },
+    Message: {
+      Subject: { Data: `Order Confirmed - #${order.orderId}` },
+      Body: {
+        Text: {
+          Data: `Thank you for your order!\n\nOrder #${order.orderId}\n\n${itemsList}\n\nSubtotal: $${order.subtotal}\nTax: $${order.tax}\nTotal: $${order.total}\n\nWe'll have it ready soon. Thanks for choosing Singh Coffee House!`,
+        },
+      },
+    },
+  };
+
+  try {
+    await sesClient.send(new SendEmailCommand(params));
+  } catch (error) {
+    console.error("Order confirmation email failed:", error.message);
+  }
+};
+
   try {
     console.log("Sending OTP via AWS SES to", toEmail);
     await sesClient.send(new SendEmailCommand(params));
@@ -286,7 +313,18 @@ app.post("/api/orders", async (req, res) => {
     }
 
     await connection.commit();
-    res.json({ success: true, orderId: orderResult.insertId });
+
+    if (customer.email?.trim()) {
+    sendOrderConfirmationEmail(customer.email.trim(), {
+      orderId: orderResult.insertId,
+      items: normalizedItems,
+      subtotal: normalizedSubtotal,
+      tax: normalizedTax,
+      total: normalizedTotal,
+    });
+  }
+
+res.json({ success: true, orderId: orderResult.insertId });
   } catch {
     if (connection) {
       await connection.rollback();
