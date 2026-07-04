@@ -9,11 +9,25 @@ import pool from "./db.js";
 
 import path from "path";
 import { fileURLToPath } from "url";
+import rateLimit from "express-rate-limit";
+
 
 const app = express();
 
+
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const otpLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // limit each IP to 5 requests per window
+  message: { error: "Too many requests. Please try again in 15 minutes." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+
 const stripeKey = process.env.STRIPE_SECRET_KEY;
 const hasUsableStripeKey = stripeKey?.startsWith("sk_") && !stripeKey.includes("...");
 const stripe = hasUsableStripeKey ? new Stripe(stripeKey) : null;
@@ -515,7 +529,7 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
-app.post("/api/auth/send-otp", async (req, res) => {
+app.post("/api/auth/send-otp", otpLimiter, async (req, res) => {
   try {
     const { authMode, contact, contactType, fullName, email, phone } = req.body;
     if (!contact || typeof contact !== "string") {
@@ -594,7 +608,7 @@ app.post("/api/auth/send-otp", async (req, res) => {
   }
 });
 
-app.post("/api/auth/verify-otp", async (req, res) => {
+app.post("/api/auth/verify-otp", otpLimiter, async (req, res) => {
   try {
     const { contact, contactType, otp, authMode } = req.body;
     if (!contact || !otp || !authMode) {
