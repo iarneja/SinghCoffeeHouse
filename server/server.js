@@ -95,7 +95,18 @@ const sendEmailOtp = async (toEmail, code) => {
     },
   };
 
-  const sendOrderConfirmationEmail = async (toEmail, order) => {
+  
+
+  try {
+    console.log("Sending OTP via AWS SES to", toEmail);
+    await sesClient.send(new SendEmailCommand(params));
+  } catch (error) {
+    console.error("SES send failed:", error);
+    throw new Error("Failed to send OTP email via AWS SES. Check your SES configuration.");
+  }
+};
+
+const sendOrderConfirmationEmail = async (toEmail, order) => {
   if (!toEmail || !sesSourceEmail) return;
 
   const itemsList = order.items
@@ -119,15 +130,6 @@ const sendEmailOtp = async (toEmail, code) => {
     await sesClient.send(new SendEmailCommand(params));
   } catch (error) {
     console.error("Order confirmation email failed:", error.message);
-  }
-};
-
-  try {
-    console.log("Sending OTP via AWS SES to", toEmail);
-    await sesClient.send(new SendEmailCommand(params));
-  } catch (error) {
-    console.error("SES send failed:", error);
-    throw new Error("Failed to send OTP email via AWS SES. Check your SES configuration.");
   }
 };
 
@@ -312,24 +314,40 @@ app.post("/api/orders", async (req, res) => {
       );
     }
 
-    await connection.commit();
+  await connection.commit();
 
     if (customer.email?.trim()) {
-    sendOrderConfirmationEmail(customer.email.trim(), {
-      orderId: orderResult.insertId,
-      items: normalizedItems,
-      subtotal: normalizedSubtotal,
-      tax: normalizedTax,
-      total: normalizedTotal,
-    });
-  }
+      sendOrderConfirmationEmail(customer.email.trim(), {
+        orderId: orderResult.insertId,
+        items: normalizedItems,
+        subtotal: normalizedSubtotal,
+        tax: normalizedTax,
+        total: normalizedTotal,
+      });
+    }
 
-res.json({ success: true, orderId: orderResult.insertId });
-  } catch {
+    res.json({ success: true, orderId: orderResult.insertId });
+  } catch (error) {
     if (connection) {
       await connection.rollback();
     }
-    res.status(500).json({ error: "Order could not be saved." });
+    console.error("Order save error:", error);
+
+    if (error.code === "ER_DUP_ENTRY") {
+      try {
+        const [existing] = await pool.execute(
+          "SELECT id FROM orders WHERE stripe_payment_intent_id = ? LIMIT 1",
+          [stripePaymentIntentId],
+        );
+        if (existing.length) {
+          return res.json({ success: true, orderId: existing[0].id, alreadyExisted: true });
+        }
+      } catch (lookupError) {
+        console.error("Order lookup after duplicate error failed:", lookupError);
+      }
+    }
+
+    res.status(500).json({ error: error.message || "Order could not be saved." });
   } finally {
     if (connection) {
       connection.release();

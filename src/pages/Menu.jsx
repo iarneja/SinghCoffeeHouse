@@ -718,17 +718,68 @@ function CartDrawer({ cart, updateCart, onClose, onCheckout }) {
   );
 }
 
+// function StripePaymentForm({ total, onPaid }) {
+//   const stripe = useStripe();
+//   const elements = useElements();
+//   const [message, setMessage] = useState("");
+//   const [processing, setProcessing] = useState(false);
+
+//   const submitPayment = async (event) => {
+//     event.preventDefault();
+//     if (!stripe || !elements) return;
+
+//     setProcessing(true);
+//     const { error, paymentIntent } = await stripe.confirmPayment({
+//       elements,
+//       confirmParams: {
+//         return_url: window.location.href,
+//       },
+//       redirect: "if_required",
+//     });
+
+//     setProcessing(false);
+
+//     if (error) {
+//       setMessage(error.message);
+//       return;
+//     }
+
+//     try {
+//       await onPaid(paymentIntent?.id);
+//     } catch (err) {
+//       setMessage(err.message);
+//     }
+//   };
+
+//   return (
+//     <form className="stripeForm" onSubmit={submitPayment}>
+//       <PaymentElement />
+//       {message && <div className="authError">{message}</div>}
+//       <button className="btn checkoutBtn" disabled={!stripe || processing}>
+//         {processing ? "Processing..." : `Pay ${money(total)}`}
+//       </button>
+//     </form>
+//   );
+// }
+
 function StripePaymentForm({ total, onPaid }) {
   const stripe = useStripe();
   const elements = useElements();
   const [message, setMessage] = useState("");
   const [processing, setProcessing] = useState(false);
+  const [succeeded, setSucceeded] = useState(false);
+  const submittingRef = useRef(false);
 
   const submitPayment = async (event) => {
     event.preventDefault();
     if (!stripe || !elements) return;
 
+    if (submittingRef.current || succeeded) return;
+    submittingRef.current = true;
+
     setProcessing(true);
+    setMessage("");
+
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
@@ -741,13 +792,18 @@ function StripePaymentForm({ total, onPaid }) {
 
     if (error) {
       setMessage(error.message);
+      submittingRef.current = false;
       return;
     }
+
+    setSucceeded(true);
 
     try {
       await onPaid(paymentIntent?.id);
     } catch (err) {
-      setMessage(err.message);
+      setMessage(
+        `Payment was successful, but we couldn't save your order automatically (${err.message}). Please contact us with your payment confirmation.`,
+      );
     }
   };
 
@@ -755,8 +811,8 @@ function StripePaymentForm({ total, onPaid }) {
     <form className="stripeForm" onSubmit={submitPayment}>
       <PaymentElement />
       {message && <div className="authError">{message}</div>}
-      <button className="btn checkoutBtn" disabled={!stripe || processing}>
-        {processing ? "Processing..." : `Pay ${money(total)}`}
+      <button className="btn checkoutBtn" disabled={!stripe || processing || succeeded}>
+        {succeeded ? "Payment received" : processing ? "Processing..." : `Pay ${money(total)}`}
       </button>
     </form>
   );
