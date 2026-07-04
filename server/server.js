@@ -7,7 +7,13 @@ import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
 import pool from "./db.js";
 
+import path from "path";
+import { fileURLToPath } from "url";
+
 const app = express();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const stripeKey = process.env.STRIPE_SECRET_KEY;
 const hasUsableStripeKey = stripeKey?.startsWith("sk_") && !stripeKey.includes("...");
 const stripe = hasUsableStripeKey ? new Stripe(stripeKey) : null;
@@ -641,6 +647,12 @@ app.post("/api/auth/verify-otp", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message || "Could not verify OTP." });
   }
+});
+
+app.use(express.static(path.join(__dirname, "..", "dist")));
+
+app.get(/^(?!\/api).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "dist", "index.html"));
 });
 
 const port = Number(process.env.SERVER_PORT || 4242);
