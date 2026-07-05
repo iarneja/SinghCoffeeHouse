@@ -154,6 +154,56 @@ a { color: inherit; text-decoration: none; }
   margin-top: 8px;
 }
 
+@media (max-width: 760px) {
+  .hero {
+    padding-top: 110px;
+    padding-bottom: 36px;
+  }
+
+  .hero-inner {
+    padding: 0 18px 18px;
+  }
+
+  .hero-content {
+    max-width: none;
+  }
+
+  .hero-title {
+    font-size: clamp(3.6rem, 12vw, 4.2rem);
+    line-height: 1.02;
+    margin-bottom: 18px;
+  }
+
+  .hero-sub {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    max-width: none;
+    margin-bottom: 24px;
+  }
+
+  .hero-cta {
+    margin-bottom: 22px;
+  }
+
+  .hero-mini {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-top: 18px;
+  }
+
+  .mini-card {
+    padding: 18px;
+  }
+
+  .mini-big {
+    font-size: 24px;
+  }
+
+  .mini-sub {
+    font-size: 14px;
+  }
+}
+
 .mini-card {
   border: 1px solid var(--border);
   background: rgba(0,0,0,0.35);
@@ -936,6 +986,255 @@ a { color: inherit; text-decoration: none; }
   overflow: auto;
   padding: 22px 16px;
   border-right: 1px solid rgba(0,0,0,0.08);
+}
+
+@media (max-width: 860px) {
+  .menuLayout {
+    display: block;
+  }
+
+  .menuSide {
+    position: relative;
+    top: 0;
+    height: auto;
+    overflow: visible;
+    padding: 16px 18px;
+    border-right: none;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    margin-bottom: 22px;
+    background: rgba(246,242,234,0.96);
+  }
+
+  .menuGroup {
+    margin-bottom: 16px;
+  }
+
+  .menuLinks {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .menuLink {
+    flex: 0 0 auto;
+    min-width: max-content;
+    white-space: nowrap;
+    padding: 10px 14px;
+    scroll-snap-align: start;
+  }
+
+  .menuMain {
+    padding: 24px 18px 40px;
+  }
+
+  .menuH1 {
+    font-size: clamp(2.4rem, 8vw, 3rem);
+    margin-bottom: 18px;
+  }
+
+  .menuCards {
+    gap: 14px;
+  }
+
+  .drinkCard {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "photo info"
+      "photo qty";
+    gap: 12px;
+    padding: 12px;
+    min-height: auto;
+  }
+
+  .drinkPhoto {
+    grid-area: photo;
+    min-height: 80px;
+    width: 80px;
+    border-radius: 16px;
+  }
+
+  .drinkPhoto img {
+    width: 100%;
+    height: 100%;
+    min-height: 80px;
+    object-fit: cover;
+  }
+
+  .drinkInfo {
+    grid-area: info;
+  }
+
+  .qtyControls {
+    grid-area: qty;
+    justify-self: start;
+    padding: 4px;
+  }
+
+  .drinkTop {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: start;
+    margin-bottom: 6px;
+  }
+
+  .drinkName {
+    font-size: 16px;
+  }
+
+  .drinkPrice {
+    font-size: 16px;
+  }
+
+  .drinkDesc {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .menuBack,
+  .cartPill,
+  .loginPill {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+
+  .menuTop {
+    flex-wrap: wrap;
+    padding: 16px 16px 12px;
+  }
+
+  .menuTopTitle {
+    flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 860px) {
+  .menuLayout {
+    display: block;
+  }
+
+  .menuSide {
+    position: relative;
+    top: 0;
+    height: auto;
+    overflow: visible;
+    padding: 16px 18px;
+    border-right: none;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    margin-bottom: 18px;
+    background: rgba(246,242,234,0.94);
+  }
+
+  .menuGroup {
+    margin-bottom: 18px;
+  }
+
+  .menuLinks {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scroll-snap-type: x mandatory;
+  }
+
+  .menuLink {
+    flex: 0 0 auto;
+    min-width: max-content;
+    padding: 10px 14px;
+    scroll-snap-align: start;
+  }
+
+  .menuMain {
+    padding: 24px 18px 40px;
+  }
+
+  .menuH1 {
+    font-size: clamp(2.4rem, 8vw, 3rem);
+    margin-bottom: 18px;
+  }
+
+  .menuCards {
+    gap: 14px;
+  }
+
+  .drinkCard {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "photo info"
+      "photo qty";
+    gap: 12px;
+    padding: 12px;
+    min-height: auto;
+  }
+
+  .drinkPhoto {
+    grid-area: photo;
+    min-height: 80px;
+    width: 80px;
+    border-radius: 16px;
+  }
+
+  .drinkPhoto img {
+    width: 100%;
+    height: 100%;
+    min-height: 80px;
+    object-fit: cover;
+  }
+
+  .drinkInfo {
+    grid-area: info;
+  }
+
+  .qtyControls {
+    grid-area: qty;
+    justify-self: start;
+    padding: 4px;
+  }
+
+  .drinkTop {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    align-items: start;
+    margin-bottom: 6px;
+  }
+
+  .drinkName {
+    font-size: 16px;
+  }
+
+  .drinkPrice {
+    font-size: 16px;
+  }
+
+  .drinkDesc {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .menuBack,
+  .cartPill,
+  .loginPill {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+
+  .menuTop {
+    flex-wrap: wrap;
+    padding: 16px 16px 12px;
+  }
+
+  .menuTopTitle {
+    flex: 1 1 100%;
+  }
 }
 
 .menuGroup {
