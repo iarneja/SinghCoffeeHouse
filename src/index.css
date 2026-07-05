@@ -1026,93 +1026,106 @@ a { color: inherit; text-decoration: none; }
   }
 
   .menuSide {
-    position: relative;
-    top: 0;
-    height: auto;
-    overflow: visible;
-    padding: 16px 18px;
-    border-right: none;
-    border-bottom: 1px solid rgba(0,0,0,0.08);
-    margin-bottom: 22px;
-    background: rgba(246,242,234,0.96);
+    display: none;
   }
 
-  .menuGroup {
-    margin-bottom: 16px;
-  }
-
-  .menuLinks {
+  .menuMobileTabs {
     display: flex;
     gap: 10px;
     overflow-x: auto;
-    padding-bottom: 10px;
+    padding: 12px 0 18px;
+    margin-bottom: 16px;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
+    position: relative;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.35) rgba(246,242,234,0.85);
   }
 
-  .menuLink {
+  .menuMobileTabs::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 60px;
+    height: 100%;
+    pointer-events: none;
+    background: linear-gradient(to right, rgba(246,242,234,0), rgba(246,242,234,1));
+  }
+
+  .menuMobileTab {
     flex: 0 0 auto;
     min-width: max-content;
+    max-width: 220px;
+    padding: 12px 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(0,0,0,0.08);
+    background: rgba(255,255,255,0.96);
+    color: #141414;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.3;
     white-space: nowrap;
-    padding: 10px 14px;
     scroll-snap-align: start;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .menuMobileTab.active {
+    background: rgba(201,164,106,0.22);
+    border-color: rgba(201,164,106,0.4);
   }
 
   .menuMain {
-    padding: 24px 18px 40px;
+    padding: 22px 18px 34px;
+    background: #f6f2ea;
   }
 
   .menuH1 {
-    font-size: clamp(2.4rem, 8vw, 3rem);
+    font-size: clamp(2.8rem, 10vw, 3.4rem);
     margin-bottom: 18px;
   }
 
   .menuCards {
-    gap: 14px;
+    gap: 12px;
   }
 
   .drinkCard {
-    display: grid;
-    grid-template-columns: 80px 1fr;
-    grid-template-rows: auto auto;
-    grid-template-areas:
-      "photo info"
-      "photo qty";
-    gap: 12px;
-    padding: 12px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px;
     min-height: auto;
+    border-radius: 18px;
   }
 
   .drinkPhoto {
-    grid-area: photo;
-    min-height: 80px;
-    width: 80px;
-    border-radius: 16px;
+    min-width: 84px;
+    width: 84px;
+    height: 84px;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #e9e0d3;
+    flex-shrink: 0;
   }
 
   .drinkPhoto img {
     width: 100%;
     height: 100%;
-    min-height: 80px;
     object-fit: cover;
+    object-position: center;
   }
 
   .drinkInfo {
-    grid-area: info;
-  }
-
-  .qtyControls {
-    grid-area: qty;
-    justify-self: start;
-    padding: 4px;
+    flex: 1;
+    min-width: 0;
   }
 
   .drinkTop {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 10px;
-    align-items: start;
-    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 8px;
   }
 
   .drinkName {
@@ -1120,12 +1133,30 @@ a { color: inherit; text-decoration: none; }
   }
 
   .drinkPrice {
-    font-size: 16px;
+    font-size: 15px;
+    font-weight: 900;
+    color: #141414;
+    background: rgba(201,164,106,0.18);
+    padding: 6px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
   }
 
   .drinkDesc {
     font-size: 13px;
-    line-height: 1.5;
+    line-height: 1.55;
+    color: rgba(20,20,20,0.72);
+    margin-bottom: 10px;
+  }
+
+  .qtyControls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0;
+    border: 1px solid rgba(201,164,106,0.22);
+    background: rgba(255,255,255,0.96);
   }
 
   .menuBack,
@@ -2099,54 +2130,92 @@ a { color: inherit; text-decoration: none; }
 
   .menuMobileTabs {
     display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 12px 0 18px;
+    margin-bottom: 16px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.35) rgba(246,242,234,0.85);
+  }
+
+  .menuMobileTabs::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 60px;
+    height: 100%;
+    pointer-events: none;
+    background: linear-gradient(to right, rgba(246,242,234,0), rgba(246,242,234,1));
+  }
+
+  .menuMobileTab {
+    flex: 0 0 auto;
+    min-width: max-content;
+    max-width: 220px;
+    padding: 12px 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(0,0,0,0.08);
+    background: rgba(255,255,255,0.96);
+    color: #141414;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.3;
+    white-space: nowrap;
+    scroll-snap-align: start;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .menuMobileTab.active {
+    background: rgba(201,164,106,0.22);
+    border-color: rgba(201,164,106,0.4);
   }
 
   .menuCards {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .drinkCard {
-    display: grid;
-    grid-template-columns: 84px 1fr;
-    grid-template-rows: auto auto;
-    grid-template-areas:
-      "photo info"
-      "photo qty";
-    gap: 12px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
     padding: 14px;
     min-height: auto;
+    border-radius: 18px;
   }
 
   .drinkPhoto {
-    grid-area: photo;
-    min-height: 84px;
+    min-width: 84px;
     width: 84px;
+    height: 84px;
     border-radius: 18px;
+    overflow: hidden;
+    background: #e9e0d3;
+    flex-shrink: 0;
   }
 
   .drinkPhoto img {
     width: 100%;
     height: 100%;
-    min-height: 84px;
     object-fit: cover;
+    object-position: center;
   }
 
   .drinkInfo {
-    grid-area: info;
-  }
-
-  .qtyControls {
-    grid-area: qty;
-    justify-self: start;
-    padding: 4px;
+    flex: 1;
+    min-width: 0;
   }
 
   .drinkTop {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 10px;
-    align-items: start;
-    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 8px;
   }
 
   .drinkName {
@@ -2154,15 +2223,32 @@ a { color: inherit; text-decoration: none; }
   }
 
   .drinkPrice {
-    font-size: 16px;
+    font-size: 15px;
+    font-weight: 900;
+    color: #141414;
+    background: rgba(201,164,106,0.18);
+    padding: 6px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
   }
 
   .drinkDesc {
     font-size: 13px;
-    line-height: 1.5;
+    line-height: 1.55;
+    color: rgba(20,20,20,0.72);
+    margin-bottom: 10px;
   }
 
-  .quantityLabel,
+  .qtyControls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0;
+    border: 1px solid rgba(201,164,106,0.22);
+    background: rgba(255,255,255,0.96);
+  }
+
   .menuBack,
   .cartPill,
   .loginPill {
