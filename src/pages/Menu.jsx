@@ -1020,6 +1020,18 @@ export default function Menu({ user, onLogin, onLogout, cart, cartCount, updateC
 
         <main className="menuMain">
           <div className="menuCrumb">Menu / {active}</div>
+          <div className="menuMobileTabs">
+            {MENU.flatMap((group) => group.items).map((item) => (
+              <button
+                key={item}
+                className={`menuMobileTab ${active === item ? "active" : ""}`}
+                onClick={() => setActive(item)}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+
           <h1 className="menuH1">{active}</h1>
 
           <div className="menuCards">
