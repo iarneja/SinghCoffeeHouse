@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home.jsx";
 import Menu from "./pages/Menu.jsx";
+import Admin from "./pages/Admin.jsx";
 
 export default function App() {
   const [user, setUser] = useState(() => {
@@ -77,6 +78,7 @@ export default function App() {
           />
         }
       />
+      <Route path="/admin" element={<Admin />} />
     </Routes>
   );
 }

@@ -10,6 +10,7 @@ import pool from "./db.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import rateLimit from "express-rate-limit";
+import { verifyAdminToken } from "./adminMiddleware.js";
 
 
 const app = express();
@@ -32,6 +33,10 @@ const stripeKey = process.env.STRIPE_SECRET_KEY;
 const hasUsableStripeKey = stripeKey?.startsWith("sk_") && !stripeKey.includes("...");
 const stripe = hasUsableStripeKey ? new Stripe(stripeKey) : null;
 const jwtSecret = process.env.JWT_SECRET || "dev_jwt_secret";
+const adminPassword = process.env.ADMIN_PASSWORD || "admin-password";
+if (!process.env.ADMIN_PASSWORD) {
+  console.warn("ADMIN_PASSWORD is not set. Using the default development admin password.");
+}
 const awsRegion = process.env.AWS_REGION || "us-east-1";
 const awsAccessKey = process.env.AWS_ACCESS_KEY_ID;
 const awsSecretKey = process.env.AWS_SECRET_ACCESS_KEY;
@@ -54,6 +59,8 @@ const toMoneyValue = (value) => {
 const isEmail = (value) => typeof value === "string" && value.includes("@") && value.includes(".");
 const normalizePhone = (value) => value.replace(/\D/g, "");
 const createOtpCode = () => String(Math.floor(1000 + Math.random() * 9000));
+
+const createAdminToken = () => jwt.sign({ admin: true }, jwtSecret, { expiresIn: "8h" });
 
 const hashPassword = (password) => {
   const salt = crypto.randomBytes(16).toString("hex");
@@ -440,6 +447,117 @@ app.post("/api/contact", async (req, res) => {
   } catch (error) {
     console.error("/api/contact error:", error);
     res.status(500).json({ error: error.message || "Could not send your message." });
+  }
+});
+
+app.post("/api/admin/login", async (req, res) => {
+  try {
+    const { password } = req.body;
+    if (!password || typeof password !== "string") {
+      return res.status(400).json({ error: "Admin password is required." });
+    }
+
+    if (password !== adminPassword) {
+      return res.status(401).json({ error: "Invalid admin password." });
+    }
+
+    const adminToken = createAdminToken();
+    res.json({ success: true, adminToken });
+  } catch (error) {
+    console.error("/api/admin/login error:", error);
+    res.status(500).json({ error: "Could not sign in as admin." });
+  }
+});
+
+app.use("/api/admin", verifyAdminToken);
+
+app.get("/api/admin/stats", async (req, res) => {
+  try {
+    const [todayRows] = await pool.execute(
+      "SELECT COUNT(*) AS count, COALESCE(SUM(total), 0) AS revenue FROM orders WHERE DATE(created_at) = CURDATE()",
+    );
+    const [allRows] = await pool.execute(
+      "SELECT COUNT(*) AS count, COALESCE(SUM(total), 0) AS revenue FROM orders",
+    );
+
+    res.json({
+      todayOrderCount: todayRows[0]?.count || 0,
+      todayRevenue: todayRows[0]?.revenue || 0,
+      allTimeOrderCount: allRows[0]?.count || 0,
+      allTimeRevenue: allRows[0]?.revenue || 0,
+    });
+  } catch (error) {
+    console.error("/api/admin/stats error:", error);
+    res.status(500).json({ error: "Could not load admin stats." });
+  }
+});
+
+app.get("/api/admin/orders", async (req, res) => {
+  try {
+    const [rows] = await pool.execute(
+      "SELECT orders.id AS order_id, customers.name AS customer_name, customers.email AS customer_email, customers.phone, orders.total, orders.payment_status, orders.order_status, orders.created_at, order_items.id AS item_id, order_items.item_name, order_items.quantity, order_items.price FROM orders INNER JOIN customers ON orders.customer_id = customers.id LEFT JOIN order_items ON orders.id = order_items.order_id ORDER BY orders.created_at DESC, orders.id DESC, order_items.id ASC",
+    );
+
+    const orders = rows.reduce((lookup, row) => {
+      if (!lookup.has(row.order_id)) {
+        lookup.set(row.order_id, {
+          id: row.order_id,
+          customerName: row.customer_name,
+          customerEmail: row.customer_email,
+          phone: row.phone,
+          total: row.total,
+          payment_status: row.payment_status,
+          order_status: row.order_status,
+          created_at: row.created_at,
+          items: [],
+        });
+      }
+
+      if (row.item_id) {
+        lookup.get(row.order_id).items.push({
+          id: row.item_id,
+          name: row.item_name,
+          quantity: row.quantity,
+          price: row.price,
+        });
+      }
+
+      return lookup;
+    }, new Map());
+
+    res.json(Array.from(orders.values()));
+  } catch (error) {
+    console.error("/api/admin/orders error:", error);
+    res.status(500).json({ error: "Could not load admin orders." });
+  }
+});
+
+app.patch("/api/admin/orders/:id/status", async (req, res) => {
+  try {
+    const orderId = Number(req.params.id);
+    const { status } = req.body;
+    if (!orderId || !status || typeof status !== "string") {
+      return res.status(400).json({ error: "Order id and status are required." });
+    }
+
+    const validStatuses = ["pending", "preparing", "ready", "completed"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: "Invalid order status." });
+    }
+
+    const [result] = await pool.execute(
+      "UPDATE orders SET order_status = ? WHERE id = ?",
+      [status, orderId],
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Order not found." });
+    }
+
+    res.json({ success: true, orderId, order_status: status });
+  } catch (error) {
+    console.error("/api/admin/orders/:id/status error:", error);
+    res.status(500).json({ error: "Could not update order status." });
   }
 });
 
