@@ -1020,7 +1020,7 @@ a { color: inherit; text-decoration: none; }
   border-color: rgba(201,164,106,0.4);
 }
 
-@media (max-width: 860px) {
+/* @media (max-width: 860px) {
   .menuLayout {
     display: block;
   }
@@ -1174,9 +1174,9 @@ a { color: inherit; text-decoration: none; }
   .menuTopTitle {
     flex: 1 1 100%;
   }
-}
+} */
 
-@media (max-width: 860px) {
+/* @media (max-width: 860px) {
   .menuLayout {
     display: block;
   }
@@ -1294,7 +1294,7 @@ a { color: inherit; text-decoration: none; }
   .menuTopTitle {
     flex: 1 1 100%;
   }
-}
+} */
 
 .menuGroup {
   margin-bottom: 18px;
