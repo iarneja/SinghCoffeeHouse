@@ -1,8 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Home from "./pages/Home.jsx";
 import Menu from "./pages/Menu.jsx";
 import Admin from "./pages/Admin.jsx";
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
 
 export default function App() {
   const [user, setUser] = useState(() => {
@@ -63,22 +73,25 @@ export default function App() {
   };
 
   return (
-    <Routes>
-      <Route path="/" element={<Home user={user} onLogin={handleLogin} cartCount={cartCount} />} />
-      <Route
-        path="/menu"
-        element={
-          <Menu
-            user={user}
-            onLogin={handleLogin}
-            onLogout={handleLogout}
-            cart={cart}
-            cartCount={cartCount}
-            updateCart={updateCart}
-          />
-        }
-      />
-      <Route path="/admin" element={<Admin />} />
-    </Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
+        <Route path="/" element={<Home user={user} onLogin={handleLogin} cartCount={cartCount} />} />
+        <Route
+          path="/menu"
+          element={
+            <Menu
+              user={user}
+              onLogin={handleLogin}
+              onLogout={handleLogout}
+              cart={cart}
+              cartCount={cartCount}
+              updateCart={updateCart}
+            />
+          }
+        />
+        <Route path="/admin" element={<Admin />} />
+      </Routes>
+    </>
   );
 }
