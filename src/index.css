@@ -866,6 +866,9 @@ a { color: inherit; text-decoration: none; }
 /* ===== Menu Page (photo-forward cards) ===== */
 .menuPage {
   min-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
   background: #f6f2ea;
   color: #141414;
 }
@@ -998,6 +1001,8 @@ a { color: inherit; text-decoration: none; }
   margin-bottom: 18px;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+  width: 100%;
+  min-width: 0;
 }
 
 .menuMobileTab {
@@ -1337,6 +1342,9 @@ a { color: inherit; text-decoration: none; }
 
 .menuMain {
   padding: 30px 34px 56px;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .menuCrumb {
