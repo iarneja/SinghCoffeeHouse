@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { apiRequest } from "../lib/api";
 
 const orderStatusOptions = ["pending", "preparing", "ready", "completed"];
 
@@ -65,8 +66,8 @@ export default function Admin() {
 
     try {
       const [statsResp, ordersResp] = await Promise.all([
-        fetch("/api/admin/stats", { headers: getAuthHeaders() }),
-        fetch("/api/admin/orders", { headers: getAuthHeaders() }),
+        apiRequest("/api/admin/stats", { headers: getAuthHeaders() }),
+        apiRequest("/api/admin/orders", { headers: getAuthHeaders() }),
       ]);
 
       if (!statsResp.ok || !ordersResp.ok) {
@@ -94,7 +95,7 @@ export default function Admin() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/admin/login", {
+      const response = await apiRequest("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password }),
@@ -126,7 +127,7 @@ export default function Admin() {
     setFetching(true);
 
     try {
-      const response = await fetch(`/api/admin/orders/${orderId}/status`, {
+      const response = await apiRequest(`/api/admin/orders/${orderId}/status`, {
         method: "PATCH",
         headers: getAuthHeaders(),
         body: JSON.stringify({ status: newStatus }),

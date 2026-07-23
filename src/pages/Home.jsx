@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { apiRequest } from "../lib/api";
 
 const leftMenu = [
   { name: "Espresso", desc: "Rich and bold shot of coffee", price: "$3.30" },
@@ -346,7 +347,7 @@ export default function Home() {
                 setContactLoading(true);
 
                 try {
-                  const response = await fetch("/api/contact", {
+                  const response = await apiRequest("/api/contact", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({

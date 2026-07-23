@@ -356,7 +356,7 @@ function LoginModal({ onClose, onLogin }) {
 
     setEmailVerifying(true);
     try {
-      const response = await fetch("/api/auth/send-otp", {
+      const response = await apiRequest("/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -391,7 +391,7 @@ function LoginModal({ onClose, onLogin }) {
 
     setEmailVerifying(true);
     try {
-      const response = await fetch("/api/auth/verify-otp", {
+      const response = await apiRequest("/api/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -427,7 +427,7 @@ function LoginModal({ onClose, onLogin }) {
         return;
       }
 
-      const response = await fetch("/api/auth/login", {
+      const response = await apiRequest("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ contact: contact.trim(), contactType, password: password.trim() }),
@@ -455,7 +455,7 @@ function LoginModal({ onClose, onLogin }) {
       return;
     }
 
-    const response = await fetch("/api/auth/signup", {
+    const response = await apiRequest("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -831,7 +831,7 @@ function CheckoutModal({ cart, user, onClose, onPaid }) {
     setSavingOrder(true);
 
     try {
-      const response = await fetch("/api/orders", {
+      const response = await apiRequest("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -864,7 +864,7 @@ function CheckoutModal({ cart, user, onClose, onPaid }) {
   useEffect(() => {
     if (!stripePromise || !amount) return;
 
-    fetch("/api/create-payment-intent", {
+    apiRequest("/api/create-payment-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ amount, customerName: user.fullName }),

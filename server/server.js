@@ -16,6 +16,26 @@ import { verifyAdminToken } from "./adminMiddleware.js";
 const app = express();
 app.set("trust proxy", 1);
 
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  const allowedOrigins = ["http://localhost:5173", "http://127.0.0.1:5173"];
+
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+
+  if (req.method === "OPTIONS") {
+    res.sendStatus(204);
+    return;
+  }
+
+  next();
+});
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -843,7 +863,7 @@ app.get(/^(?!\/api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, "..", "dist", "index.html"));
 });
 
-const port = Number(process.env.SERVER_PORT || 4242);
+const port = Number(process.env.PORT || process.env.SERVER_PORT || 4242);
 app.listen(port, () => {
   console.log(`Payment API running on http://localhost:${port}`);
 });
